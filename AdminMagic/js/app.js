@@ -1,21 +1,13 @@
 (function() {
-	var app = angular.module('dcmdAdmin', ['btford.socket-io']);
+	var app = angular.module('dcmdAdmin', ['socket-io']);
 
-	app.factory('ServerSocket', function (socketFactory) {
+	// app.config(["$socketProvider", function ($socketProvider) {
+ //      $socketProvider.setUrl("http://localhost:3000");
+ //    }]);
 
-		var ServerIOSocket = io.connect('http://localhost:3000');
-		ServerSocket = socketFactory({
-			ioSocket : ServerIOSocket
-		});
-
-		return ServerSocket;
-	});
-
-	app.controller('adminController', ['$scope','ServerSocket',function($scope, ServerSocket) {
+	app.controller('adminController', ['$scope','socket',function($scope, socket) {
 		// console.log("Hola")
-		$scope.$on("socket:error", function(ev, data){
-			console.log("Event: " + ev);
-			console.log("Data: " + data);
-		});
+		socket
+		socket.emit("userConnected", "hola")
 	}]);
 })();
