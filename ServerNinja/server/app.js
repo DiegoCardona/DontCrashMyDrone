@@ -19,6 +19,6 @@ socket.on('connection', function(sk) {
 		userType: ''
 	};
 	sk.on('userConnected', function(data) {
-		sk.emit('confirmConnection');
+		sk.emit('confirmedConnection');
 	});
 });
