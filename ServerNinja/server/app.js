@@ -22,3 +22,5 @@ socket.on('connection', function(sk) {
 		sk.emit('confirmedConnection');
 	});
 });
+
+module.exports = app;
