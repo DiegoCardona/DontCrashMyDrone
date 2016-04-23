@@ -2,6 +2,14 @@
 var mongoose = require('mongoose');
 
 var schema = new mongoose.Schema({
+	id: {
+		type: String,
+		default: '0'
+	},
+	accuracy: {
+		type: Number,
+		default: 0.0
+	},
 	latitude: {
 		type: Number,
 		default: 0.0
