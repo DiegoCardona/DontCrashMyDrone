@@ -4,4 +4,8 @@ var socket = require('socket.io')();
 var mongoose = require('mongoose');
 
 mongoose.connect('mongodb://localhost:27017/chat');
-var models = require('./models');
+
+// Models definition
+var NFZ = require('./models/NFZModel');
+var NFZ = require('./models/WAZModel');
+var NFZ = require('./models/DroneModel');
