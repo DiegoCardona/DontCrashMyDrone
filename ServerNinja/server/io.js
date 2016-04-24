@@ -39,7 +39,7 @@ socket.on('connection', function(sk) {
 		clients[data.id] = sk.client.id;
 
 		Drone.findOne({
-			id: data.id
+			external_id: data.id
 		}, function(err, drones) {
 			if (drones != null && drones.length > 0) {
 				drones.accuracy = data.accuracy;
@@ -51,7 +51,7 @@ socket.on('connection', function(sk) {
 				drones.save();
 			} else {
 				droneSave = new Drone({
-					id: data.id,
+					external_id: data.id,
 					accuracy: data.accuracy,
 					latitude: data.latitude,
 					longitude: data.longitude,
@@ -79,7 +79,7 @@ socket.on('connection', function(sk) {
 			sk.join('admin');
 
 		User.findOne({
-			id: data.id
+			external_id: data.id
 		}, function(err, users) {
 			if (users != null && users.length > 0) {
 				users.Drone = data.droneId;
@@ -100,7 +100,7 @@ socket.on('connection', function(sk) {
 		});
 
 		Drone.findOne({
-			id: data.droneId
+			external_id: data.droneId
 		}, function(err, drones) {
 			WAZ.find({}, function(err, wazes) {
 				if (wazes == null)
@@ -109,7 +109,7 @@ socket.on('connection', function(sk) {
 					if (nfzes == null)
 						nfzes = [];
 					Drone.find({
-						id: {
+						external_id: {
 							$ne: data.droneId
 						}
 					}, function(err, dronesExt) {
@@ -134,7 +134,7 @@ socket.on('connection', function(sk) {
 		clients[data.id] = sk.client.id;
 
 		Drone.findOne({
-			id: data.droneId
+			external_id: data.droneId
 		}, function(err, drones) {
 			WAZ.find({}, function(err, wazes) {
 				if (wazes == null)
@@ -143,8 +143,8 @@ socket.on('connection', function(sk) {
 					if (nfzes == null)
 						nfzes = [];
 					Drone.find({
-						_id: {
-							$ne: drones._id
+						external_id: {
+							$ne: droneId
 						}
 					}, function(err, dronesExt) {
 						if (dronesExt == null)
@@ -192,7 +192,7 @@ socket.on('connection', function(sk) {
 		clients[data.id] = sk.client.id;
 
 		Drone.find({
-				id: {
+				external_id: {
 					$ne: droneId
 				}
 			},
@@ -209,7 +209,7 @@ socket.on('connection', function(sk) {
 		clients[data.id] = sk.client.id;
 
 		Drone.findOne({
-			id: data.droneId
+			external_id: data.droneId
 		}, function(err, drones) {
 			sk.emit('/#' + clients[data.id]).emit('droneHealthy', drones);
 		});
