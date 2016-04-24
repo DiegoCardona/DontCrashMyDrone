@@ -1,134 +1,59 @@
 var express = require('express');
-var app = express();
-var socket = require('socket.io')();
+var path = require('path');
+var favicon = require('serve-favicon');
+var logger = require('morgan');
+var cookieParser = require('cookie-parser');
+var bodyParser = require('body-parser');
 var mongoose = require('mongoose');
+
+var app = express();
 
 mongoose.connect('mongodb://localhost:27017/chat');
 
-// Models definition
-var NFZ = require('./models/NFZModel');
-var WAZ = require('./models/WAZModel');
-var Drone = require('./models/DroneModel');
+// view engine setup
+app.set('views', path.join(__dirname, 'views'));
+app.set('view engine', 'jade');
 
-// Socket logic
-socket.on('connection', function(sk) {
+// uncomment after placing your favicon in /public
+//app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
+app.use(logger('dev'));
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({
+	extended: false
+}));
+app.use(cookieParser());
+app.use(express.static(path.join(__dirname, 'public')));
 
-	clients[sk.client.id] = {
-		socket: socket,
-		username: '',
-		userType: ''
-	};
+// catch 404 and forward to error handler
+app.use(function(req, res, next) {
+	var err = new Error('Not Found');
+	err.status = 404;
+	next(err);
+});
 
-	sk.on('testConnection', function(data) {
-		sk.emit('confirmedConnection');
+// error handlers
+
+// development error handler
+// will print stacktrace
+if (app.get('env') === 'development') {
+	app.use(function(err, req, res, next) {
+		res.status(err.status || 500);
+		res.render('error', {
+			message: err.message,
+			error: err
+		});
 	});
+}
 
-	sk.on('droneReport', function(data) {
-		sk.emit('ok');
-	});
-
-	sk.on('clientConnection', function(data) {
-		mapData = {
-			Drone: {
-				id: '01'
-				accuracy: 0
-				latitude: 0.0,
-				longitude: 0.0,
-				height: 0.0,
-				destination: 'ND'
-				velocity: 0
-			},
-			WAZ: [{
-				latitude: 0.0,
-				longitude: 0.0,
-				radio: 1,
-				description: 'No description Assgined',
-				warinig_levet: 'low'
-			}],
-			NFZ: [{
-				latitude: 0.0,
-				longitude: 0.0,
-				radio: 1,
-				description: 'No description Assgined'
-			}]
-		};
-		sk.emit(mapData);
-	});
-
-	sk.on('allMap', function(data) {
-		mapData = {
-			Drone: {
-				id: '01'
-				accuracy: 0
-				latitude: 0.0,
-				longitude: 0.0,
-				height: 0.0,
-				destination: 'ND'
-				velocity: 0
-			},
-			WAZ: [{
-				latitude: 0.0,
-				longitude: 0.0,
-				radio: 1,
-				description: 'No description Assgined',
-				warinig_levet: 'low'
-			}],
-			NFZ: [{
-				latitude: 0.0,
-				longitude: 0.0,
-				radio: 1,
-				description: 'No description Assgined'
-			}]
-		};
-		sk.emit(mapData);
-	});
-
-	sk.on('wazMap', function(data) {
-		wazMap = [{
-			latitude: 0.0,
-			longitude: 0.0,
-			radio: 1,
-			description: 'No description Assgined',
-			warinig_levet: 'low'
-		}];
-		sk.emit(wazMap);
-	});
-
-	sk.on('nfzMap', function(data) {
-		nfzMap = [{
-			latitude: 0.0,
-			longitude: 0.0,
-			radio: 1,
-			description: 'No description Assgined'
-		}];
-		sk.emit(nfzMap);
-	});
-
-	sk.on('dronesMap', function(data) {
-		droneMap = [{
-			id: '01'
-			accuracy: 0
-			latitude: 0.0,
-			longitude: 0.0,
-			height: 0.0,
-			destination: 'ND'
-			velocity: 0
-		}];
-		sk.emit(droneMap);
-	});
-
-	sk.on('droneHealthy', function(data) {
-		droneMap = {
-			id: '01'
-			accuracy: 0
-			latitude: 0.0,
-			longitude: 0.0,
-			height: 0.0,
-			destination: 'ND'
-			velocity: 0
-		};
-		sk.emit(droneMap);
+// production error handler
+// no stacktraces leaked to user
+app.use(function(err, req, res, next) {
+	res.status(err.status || 500);
+	res.render('error', {
+		message: err.message,
+		error: {}
 	});
 });
+
 
 module.exports = app;
