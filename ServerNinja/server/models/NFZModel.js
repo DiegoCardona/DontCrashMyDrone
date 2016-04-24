@@ -17,6 +17,14 @@ var schema = new mongoose.Schema({
 	description: {
 		type: String,
 		default: 'No description Assgined'
+	},
+	created: {
+		type: Date,
+		default: Date.now
+	},
+	updated: {
+		type: Date,
+		default: Date.now
 	}
 });
 

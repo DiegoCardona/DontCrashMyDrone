@@ -15,6 +15,8 @@
 	longitude: 0.0, // type number
 	radius: 1, // type number, the radio would be given in meters
 	description: 'No description Assgined' // type string, text that describe the type o reason because is a restricted area
+	created: new Date(), // created date
+	updated: new Date() // updated date 
 }
 
 /*WAZ object*/
