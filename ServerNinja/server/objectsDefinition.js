@@ -5,7 +5,7 @@
 	latitude: 0.0, // type number
 	longitude: 0.0, // type number
 	height: 0.0, // type number, meters
-	destination: 'ND' // type string
+	orientation: 'ND' // type string
 	velocity: 0 // type number, meters over seconds
 }
 
