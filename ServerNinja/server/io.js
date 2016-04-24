@@ -88,7 +88,7 @@ socket.on('connection', function(sk) {
 				users.save();
 			} else {
 				userSave = new User({
-					id: data.id,
+					external_id: data.id,
 					Drone: data.droneId,
 					role: data.role,
 					email: data.email
