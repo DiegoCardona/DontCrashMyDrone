@@ -21,6 +21,7 @@
 		$scope.circles = [];
 		$scope.nfzArray = [];
 		$scope.wazArray = [];
+		$scope.alertOpen = false;
 
 		$scope.infoWindow = new google.maps.InfoWindow({
 			content: "",
@@ -57,8 +58,11 @@
 		})
 
 		socket.on("alert", function(alertData) {
-			console.log("Alert: " + alertData);
-			openAlert(alertData.title, alertData.description);
+			console.log(alertData);
+			
+			if(!$scope.alertOpen) {
+				openAlert(alertData.title, alertData.description);
+			}
 		});
 
 		$scope.checkMap = function() {
@@ -210,12 +214,17 @@
 		};
 
 		var AlertModalController = function($scope, $uibModalInstance, title, message) {
+			$scope.modalTitle = title;
+			$scope.modalMessage = message;
+
 			$scope.positiveClick = function() {
 				$uibModalInstance.close();
+				$scope.$$prevSibling.alertOpen = false;
 			};
 		};
 
 		var openAlert = function(title, message) {
+			$scope.alertOpen = true;
 			var alertModal = $uibModal.open({
 				templateUrl: './alertModal.html',
 				controller: AlertModalController,

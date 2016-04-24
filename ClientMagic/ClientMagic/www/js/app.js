@@ -3,9 +3,9 @@
 // angular.module is a global place for creating, registering and retrieving Angular modules
 // 'starter' is the name of this angular module example (also set in a <body> attribute in index.html)
 // the 2nd parameter is an array of 'requires'
-angular.module('starter', ['ionic'])
+angular.module('starter', ['ionic','socket-io','google-maps'])
 
-.run(function($ionicPlatform) {
+.run(function($ionicPlatform, socket) {
   $ionicPlatform.ready(function() {
     if(window.cordova && window.cordova.plugins.Keyboard) {
       // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
@@ -34,6 +34,61 @@ angular.module('starter', ['ionic'])
       };
 
       navigator.geolocation.getCurrentPosition(onSuccess, onError);
+
+      var clientData = {
+        id: "jalopezmo",
+        role: "admin",
+        email: "fake@fake.com",
+        droneId: "1969"
+      };
+
+      socket.emit("clientConnection", clientData);
+
+      $scope.checkMap = function() {
+        if($scope.mapInstance) {
+          google.maps.event.trigger($scope.mapInstance, 'resize');
+          $scope.mapInstance.setCenter(new google.maps.LatLng(4.6425047, -74.0888265));
+        }
+        else{
+          setTimeout( function() {
+            $scope.checkMap();
+          }, 200);
+        }
+      };
+
+      $scope.checkMap();
+
+      $scope.map = {
+        center: {
+          latitude: 4.6425047,
+          longitude: -74.0888265},
+        zoom: 13,
+        events: {
+          tilesloaded: function (map) {
+            $scope.$apply(function () {
+              $scope.mapInstance = map;
+
+              if(firstExecution) {
+                socket.emit("clientConnection", clientData);
+                firstExecution = false;
+                createClickHandler();
+              }
+            });
+          }
+        },
+        options: {
+          mapTypeId: google.maps.MapTypeId.ROADMAP,
+          streetViewControl: false,
+          zoomControl: true,
+          zoomControlOptions: {
+                      position: google.maps.ControlPosition.RIGHT_BOTTOM
+                  },
+                  mapTypeControl: true,
+          scaleControl: false,
+          panControl: false
+        }, 
+        show: true  
+      };
     }
     if(window.StatusBar) {
       StatusBar.styleDefault();
