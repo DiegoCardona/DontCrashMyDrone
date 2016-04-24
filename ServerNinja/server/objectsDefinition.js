@@ -5,7 +5,7 @@
 	latitude: 0.0, // type number
 	longitude: 0.0, // type number
 	height: 0.0, // type number, meters
-	destination: 'ND' // type string
+	orientation: 'ND' // type string
 	velocity: 0 // type number, meters over seconds
 }
 
@@ -24,4 +24,13 @@
 	radio: 1, // type number, the radio would be given in meters
 	description: 'No description Assgined', // type string
 	warinig_levet: 'low' // type string, low, medius, high, disaster
+}
+
+
+/*event clientConnection send*/
+{
+	id: '0a', // type string, unique
+	droneId: '01', // type string 
+	role: 'admin/customer' // type string, two options, admin or customer
+	email: 'fake@lie.com' // type string, would be in a valid email format 
 }

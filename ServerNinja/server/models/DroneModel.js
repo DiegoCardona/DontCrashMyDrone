@@ -22,7 +22,7 @@ var schema = new mongoose.Schema({
 		type: Number,
 		default: 0.0
 	},
-	destination: {
+	orientation: {
 		type: String,
 		default: 'ND'
 	},
