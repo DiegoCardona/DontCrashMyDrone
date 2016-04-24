@@ -4,6 +4,47 @@ Web platform to manage drones and evade dangerous zones and dangerous crashes be
 
 ### Socket Events
 
+**event:** testConnection
+**response:** confirmedConnection
+**sent data:** ```json {id:'some_real_id'}```
+**received data:** ok
+
+**event:** clientConnection
+**response:** connection
+**sent data:** ```json {id: '0a', // type string, uniquedroneId: '01', // type string role: 'admin/customer' // type string, two options, admin or customeremail: 'fake@lie.com' // type string, would be in a valid email format }```
+**received data:** ```json {Drone:{},Drones:[{}],WAZ:[{}],NFZ:[{}]}```
+
+**event:** droneReport
+**response:** report
+**sent data:** ```json {id: '01' // type string, unique id generated from deviceaccuracy: 0 // type numberlatitude: 0.0, // type numberlongitude: 0.0, // type numberheight: 0.0, // type number, metersorientation: 'ND' // type stringvelocity: 0 // type number, meters over seconds}```
+**received data:** ok
+
+**event:** allMap
+**response:** allMap
+**sent data:** ```json {id: '0a', // type string, uniquedroneId: '01', // type string role: 'admin/customer' // type string, two options, admin or customeremail: 'fake@lie.com' // type string, would be in a valid email format }```
+**received data:** ```json {Drone:{},Drones:[{}],WAZ:[{}],NFZ:[{}]}```
+
+**event:** wazMap
+**response:** wazMap
+**sent data:** ```json {id: 'xx'}```
+**received data:** WAZ Objects List
+
+**event:** nfzMap
+**response:** nfzMap
+**sent data:** ```json {id: 'xx'}```
+**received data:** NFZ Objects List
+
+**event:** dronesMap
+**response:** dronesMap
+**sent data:** ```json {id: 'xx',droneId: 'current_drone_id'}```
+**received data:** Drones Objects List
+
+**event:** droneHealthy
+**response:** droneHealthy
+**sent data:** ```json {id: 'xx',droneId: 'x1x'}```
+**received data:** Drone Object
+
+
 ### Objects Format Definition
 **Drone object**
 ```json

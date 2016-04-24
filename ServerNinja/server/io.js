@@ -75,7 +75,7 @@ socket.on('connection', function(sk) {
 
 		if (typeof data.droneId != 'undefined')
 			sk.join(data.droneId);
-		else if (typeof data.role != 'admin')
+		else if (data.role == 'admin')
 			sk.join('admin');
 
 		User.findOne({
@@ -109,8 +109,8 @@ socket.on('connection', function(sk) {
 					if (nfzes == null)
 						nfzes = [];
 					Drone.find({
-						_id: {
-							$ne: drones._id
+						id: {
+							$ne: data.droneId
 						}
 					}, function(err, dronesExt) {
 						if (dronesExt == null)
