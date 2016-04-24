@@ -36,6 +36,32 @@ socket.on('connection', function(sk) {
 
 	sk.on('droneReport', function(data) {
 		sk.join(data.id);
+		Drone.findOne({
+			id: data.id
+		}, function(err, drones) {
+			if (drones != null && drones.length > 0) {
+				drones.accuracy = data.accuracy;
+				drones.latitude = data.latitude;
+				drones.longitude = data.longitude;
+				drones.height = data.height;
+				drones.orientation = data.orientation;
+				drones.velocity = data.velocity;
+				drones.save();
+			} else {
+				droneSave = new Drone({
+					id: data.id,
+					accuracy: data.accuracy,
+					latitude: data.latitude,
+					longitude: data.longitude,
+					height: data.height,
+					orientation: data.orientation,
+					velocity: data.velocity
+				});
+				droneSave.save(function(err) {
+					console.log(err)
+				});
+			}
+		});
 		sk.to(data.id).emit('report', data);
 		sk.to('admin').emit('report', data);
 	});
