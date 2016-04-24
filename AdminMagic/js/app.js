@@ -255,7 +255,7 @@
 			});
 
 			marker.addListener('click', function(event) {
-				$scope.infoWindow.setContent(droneData.id);															
+				$scope.infoWindow.setContent("Drone: " + droneData.id);															
 				$scope.mapInstance.panTo(event.latLng);
 				$scope.infoWindow.open($scope.mapInstance, this);
 			});
@@ -270,10 +270,10 @@
 		var createCircle = function(zoneData, isNFZ) {
 
 			var zoneCircle = new google.maps.Circle({
-								    strokeColor: isNFZ?'#FCFC6F':'#38DEFF',
+								    strokeColor: isNFZ?'#ff8080':'#38DEFF',
 								    strokeOpacity: 0.8,
 								    strokeWeight: 2,
-								    fillColor: isNFZ?'#FFFF82':'#6EE7FF',
+								    fillColor: isNFZ?'#ffb3b3':'#6EE7FF',
 								    fillOpacity: 0.2,
 								    map: $scope.mapInstance,
 								    center: new google.maps.LatLng(parseFloat(zoneData.latitude), parseFloat(zoneData.longitude)),

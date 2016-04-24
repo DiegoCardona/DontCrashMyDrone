@@ -5,7 +5,7 @@
 // the 2nd parameter is an array of 'requires'
 var example = angular.module('starter', ['ionic','socket-io'])
 
-.run(function($ionicPlatform, socket) {
+.run(function($ionicPlatform) {
   $ionicPlatform.ready(function() {
     if(window.cordova && window.cordova.plugins.Keyboard) {
       // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
@@ -33,77 +33,135 @@ var example = angular.module('starter', ['ionic','socket-io'])
               'message: ' + error.message + '\n');
       };
 
-      navigator.geolocation.getCurrentPosition(onSuccess, onError);
-
-      var clientData = {
-        id: "jalopezmo",
-        role: "admin",
-        email: "fake@fake.com",
-        droneId: "1969"
-      };
-
-      socket.emit("clientConnection", clientData);
-
-      $scope.checkMap = function() {
-        if($scope.mapInstance) {
-          google.maps.event.trigger($scope.mapInstance, 'resize');
-          $scope.mapInstance.setCenter(new google.maps.LatLng(4.6425047, -74.0888265));
-        }
-        else{
-          setTimeout( function() {
-            $scope.checkMap();
-          }, 200);
-        }
-      };
-
-      $scope.checkMap();
-
-      $scope.map = {
-        center: {
-          latitude: 4.6425047,
-          longitude: -74.0888265},
-        zoom: 13,
-        events: {
-          tilesloaded: function (map) {
-            $scope.$apply(function () {
-              $scope.mapInstance = map;
-
-              if(firstExecution) {
-                socket.emit("clientConnection", clientData);
-                firstExecution = false;
-                createClickHandler();
-              }
-            });
-          }
-        },
-        options: {
-          mapTypeId: google.maps.MapTypeId.ROADMAP,
-          streetViewControl: false,
-          zoomControl: true,
-          zoomControlOptions: {
-                      position: google.maps.ControlPosition.RIGHT_BOTTOM
-                  },
-                  mapTypeControl: true,
-          scaleControl: false,
-          panControl: false
-        }, 
-        show: true  
-      };
+      // navigator.geolocation.getCurrentPosition(onSuccess, onError);
     }
     if(window.StatusBar) {
       StatusBar.styleDefault();
     }
   });
 })
+.controller("MainController", function($scope, socket, $ionicPopup, $rootScope){
+  var clientData = {
+    id: "jalopezmo",
+    role: "admin",
+    email: "fake@fake.com",
+    droneId: "1969"
+  };
 
-example.controller("MapController", function($scope){
+  $scope.droneData;
+  $scope.marker;
+  $scope.infoWindow = new google.maps.InfoWindow({
+    content: "",
+    maxWidth: 150
+  });
+  $scope.circles = [];
+
+  var inputPopup = $ionicPopup.prompt({
+    title: "Ingresa el ID de tu drone",
+    inputType: 'text',
+    inputPlaceholder: 'ID de tu drone',
+    okText: 'Aceptar'
+  });
+
+  inputPopup.then(function(res) {
+    console.log(res);
+    clientData.droneId = res;
+    socket.emit("clientConnection", clientData);
+  });
+
+  socket.on("connection", function(data) {
+    console.log(data);
+    $scope.nfzArray = data.NFZ;
+    $scope.wazArray = data.WAZ;
+
+    $scope.nfzArray.forEach(function(nfz) {
+      createCircle(nfz, true);
+    });
+    $scope.wazArray.forEach(function(waz) {
+      createCircle(waz, false);
+    });
+  });
+
+  socket.on("report", function(droneData) {
+    console.log(droneData);
+
+    var parsedData = JSON.parse(droneData);
+
+    var found = false;
+
+    $scope.droneData = parsedData;
+
+    setMarker($scope.droneData);
+  });
+
+  var setMarker = function(droneData) {
+    var icon = {
+      url:"./res/arrow_" + droneData.orientation + ".png",
+      scaledSize: new google.maps.Size(30, 34)
+    };
+    
+    if($scope.marker) {
+      $scope.marker.setMap(null);
+      $scope.marker = null;
+    }
+
+    $scope.marker = new google.maps.Marker({
+      map:$rootScope.map,
+      icon: icon,
+      draggable: false,
+      position: new google.maps.LatLng(droneData.latitude, droneData.longitude),
+      title: droneData.id
+    });
+
+    $scope.marker.addListener('click', function(event) {
+      $scope.infoWindow.setContent(droneData.id);                             
+      $rootScope.map.panTo(event.latLng);
+      $scope.infoWindow.open($rootScope.map, this);
+    });
+
+    $rootScope.map.panTo(new google.maps.LatLng(droneData.latitude, droneData.longitude));
+  }
+
+  var createCircle = function(zoneData, isNFZ) {
+
+    var zoneCircle = new google.maps.Circle({
+                  strokeColor: isNFZ?'#ff8080':'#38DEFF',
+                  strokeOpacity: 0.8,
+                  strokeWeight: 2,
+                  fillColor: isNFZ?'#ffb3b3':'#6EE7FF',
+                  fillOpacity: 0.2,
+                  map: $rootScope.map,
+                  center: new google.maps.LatLng(parseFloat(zoneData.latitude), parseFloat(zoneData.longitude)),
+                  radius: parseFloat(zoneData.radius)
+                });
+
+    google.maps.event.addListener(zoneCircle, 'click', function(event) {
+      $scope.infoWindow.setContent(zoneData.description);                             
+      $scope.infoWindow.setPosition(event.latLng);
+      $rootScope.map.panTo(event.latLng);
+      $scope.infoWindow.open($rootScope.map, this);
+    });
+
+    $scope.circles.push(zoneCircle);
+  };
+})
+
+example.controller("MapController", function($scope,$rootScope){
     google.maps.event.addDomListener(window,"load",function(){
-        var mylatlng = new google.maps.LatLng(37.30000,-120.4833);
+        var mylatlng = new google.maps.LatLng(4.6425047, -74.0888265);
 
         var mapOptions = {
           center: mylatlng,
           zoom: 16,
-          mapTypeId: google.maps.MapTypeId.ROADMAP
+          mapTypeId: google.maps.MapTypeId.ROADMAP,
+          streetViewControl: false,
+          zoomControl: true,
+          zoomControlOptions: {
+            position: google.maps.ControlPosition.RIGHT_BOTTOM
+          },
+          mapTypeControl: false,
+          scaleControl: false,
+          panControl: false
         };
 
         var map = new google.maps.Map(document.getElementById("map"), mapOptions);
@@ -119,7 +177,7 @@ example.controller("MapController", function($scope){
           console.log(error);
         });
       
-    $scope.map = map;
+    $rootScope.map = map;
 
     });
 });

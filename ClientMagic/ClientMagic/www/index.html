@@ -27,26 +27,9 @@
   </head>
   <body ng-app="starter">
 
-<!--     <ion-pane>
+    <ion-pane ng-controller="MainController">
       <ion-header-bar class="bar-stable">
-        <h1 class="title">Drone Watch</h1>
-      </ion-header-bar>
-      <ion-content id="map-container" scroll="false" data-tap-disabled="true" class="has-header"> </div>
-      <div id="map">
-      <google-map
-        center="map.center" 
-        zoom="map.zoom"
-        draggable="true"
-        events="map.events"
-        options="map.options">
-      </google-map>
-      
-     
-        </ion-content>
-    </ion-pane> -->
-        <ion-pane>
-      <ion-header-bar class="bar-stable">
-        <h1 class="title">Don't crash my drone</h1>
+        <h1 class="title">Fly drone fly</h1>
       </ion-header-bar>
       <ion-content ng-controller="MapController">
         <div id="map" data-tap-disabled="true"></div>
