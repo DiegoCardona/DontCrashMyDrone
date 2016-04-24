@@ -19,6 +19,7 @@ var log = function(inst) {
 var NFZ = require('./models/NFZModel');
 var WAZ = require('./models/WAZModel');
 var Drone = require('./models/DroneModel');
+var User = require('./models/UserModel');
 
 // Socket logic
 socket.on('connection', function(sk) {
@@ -71,6 +72,7 @@ socket.on('connection', function(sk) {
 			sk.join(data.droneId);
 		else if (typeof data.role != 'admin')
 			sk.join('admin');
+
 		mapData = {
 			Drone: {
 				id: '01',
