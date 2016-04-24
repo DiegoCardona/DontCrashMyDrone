@@ -7,6 +7,15 @@ html, body, div.map_container {
     background: #fafafa;
 }
 
+.scroll{
+    height: 100%;
+}
+
+#map{
+    height: 100%;
+    width: 100%;
+}
+
 div.map_container {
     position: relative;
     width: 70%;
