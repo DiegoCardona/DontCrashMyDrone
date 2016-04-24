@@ -64,7 +64,7 @@ socket.on('connection', function(sk) {
 				});
 			}
 		});
-		sk.emit('/#' + clients[data.id]).emit('report', 'ok');
+		sk.broadcast.to('/#' + clients[data.id]).emit('report', 'ok');
 		sk.broadcast.to('admin').emit('report', data);
 	});
 
@@ -73,10 +73,9 @@ socket.on('connection', function(sk) {
 		console.log(data);
 		clients[data.id] = sk.client.id;
 
-		/*if (typeof data.droneId != 'undefined')
-			sk.join(data.droneId);
-		else */
-		if (data.role == 'admin')
+		if (data.role == 'customer')
+			sk.join('/#' + data.droneId);
+		else if (data.role == 'admin')
 			sk.join('admin');
 
 		User.findOne({
