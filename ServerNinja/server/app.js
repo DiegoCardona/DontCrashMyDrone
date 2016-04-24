@@ -92,5 +92,8 @@ form.append('file', '<FILE_DATA>', {
 	contentType: 'text/plain'
 });
 
+app.get('/', function(req, res) {
+	res.sendFile(path.join(__dirname + '/public/index.html'));
+});
 
 module.exports = app;
