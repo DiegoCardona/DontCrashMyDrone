@@ -184,3 +184,27 @@ email: 'fake@lie.com' // type string, would be in a valid email format }```
 	distance: 0 // the distance will be given in meters 
 }
 ```
+
+
+### Api Integrations
+
+The api integration allow the user to make their own module to consume an external api, parser it and upload the module to our system and share it with the world.
+
+
+**Conditions:**
+
+* The file to upload have to be a JS file.
+* The file have to export a module.
+* The module have to have a run function that return the parsed data.
+
+
+**Data Format:**
+
+```javascript
+[{
+	latitude: 0.0, // type number
+	longitude: 0.0, // type number
+	radius: 1, // type number, the radio would be given in meters
+	description: 'No description Assgined' // type string, text that describe the type o reason because is a restricted area
+}]
+```

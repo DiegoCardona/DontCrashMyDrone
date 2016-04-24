@@ -76,7 +76,7 @@ socket.on('connection', function(sk) {
 				if (distance < 200) {
 					alert = {
 						title: 'Unauthorized flying zone',
-						description: 'You are at less of 200 meters of an unauthorized flying zone.',
+						description: 'Drone ' + data.id + ' is at less of 200 meters of an unauthorized flying zone.',
 						distance: distance
 					}
 					sk.broadcast.to('/#' + clients[data.id]).emit('alert', alert);
@@ -94,7 +94,7 @@ socket.on('connection', function(sk) {
 				if (distance < 200) {
 					alert = {
 						title: 'Dangerous weather',
-						description: 'At less of 200 meters the weather could be dangerous for fly.',
+						description: 'Drone ' + data.id + ' is at less of 200 meters the weather could be dangerous for fly.',
 						distance: distance
 					}
 					sk.broadcast.to('/#' + clients[data.id]).emit('alert', alert);

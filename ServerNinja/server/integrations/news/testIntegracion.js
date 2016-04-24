@@ -1,5 +1,4 @@
 var test = {
-	name: 'testIntegracion',
 	run: function() {
 		return [{
 			latitude: 0.1,
