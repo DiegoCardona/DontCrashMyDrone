@@ -164,4 +164,23 @@ email: 'fake@lie.com' // type string, would be in a valid email format }```
 }
 ```
 
-continue
+
+
+### Socket Alerts
+
+
+**emit:** alert
+
+**kind of alerts:**
+* At less of 200 meters of a Non Flying Zone
+* At less of 200 meters of a Weather Alert Zone
+
+**response:**
+
+```javascript
+{
+	title: 'Unauthorized flying zone / Dangerous weather',
+	description: 'A specific alert messaage'
+	distance: 0 // the distance will be given in meters 
+}
+```

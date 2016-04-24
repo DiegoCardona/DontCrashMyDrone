@@ -24,8 +24,6 @@ var User = require('./models/UserModel');
 // Socket logic
 socket.on('connection', function(sk) {
 
-
-
 	sk.on('testConnection', function(data) {
 		console.log('testConnection event');
 		console.log(data);
@@ -64,8 +62,43 @@ socket.on('connection', function(sk) {
 				});
 			}
 		});
-		sk.broadcast.to('/#' + clients[data.id]).emit('report', 'ok');
+		sk.broadcast.to('/#' + clients[data.id]).emit('report', data);
 		sk.broadcast.to('admin').emit('report', data);
+
+		//alerts
+		NFZ.find({}, function(err, nfzes) {
+			if (nfzes == null)
+				nfzes = [];
+
+			nfzes.forEach(function(nfz) {
+				distance = getDistance(nfz.latitude, nfz.longitude, data.latitude, data.logitude);
+				if (distance < 200) {
+					alert = {
+						title: 'Unauthorized flying zone',
+						description: 'You are at less of 200 meters of an unauthorized flying zone.',
+						distance: distance
+					}
+					sk.broadcast.to('/#' + clients[data.id]).emit('alert', alert);
+				}
+			});
+		});
+
+		WAZ.find({}, function(err, wazes) {
+			if (wazes == null)
+				wazes = [];
+
+			wazes.forEach(function(waz) {
+				distance = getDistance(waz.latitude, waz.longitude, data.latitude, data.logitude);
+				if (distance < 200) {
+					alert = {
+						title: 'Dangerous weather',
+						description: 'At less of 200 meters the weather could be dangerous for fly.',
+						distance: distance
+					}
+					sk.broadcast.to('/#' + clients[data.id]).emit('alert', alert);
+				}
+			});
+		});
 	});
 
 	sk.on('clientConnection', function(data) {
@@ -227,5 +260,23 @@ socket.on('connection', function(sk) {
 		});
 	});
 });
+
+/*the distance returned will be in meters*/
+function getDistance(lat1, lon1, lat2, lon2) {
+	var R = 6371; // Radius of the earth in km
+	var dLat = deg2rad(lat2 - lat1); // deg2rad below
+	var dLon = deg2rad(lon2 - lon1);
+	var a =
+		Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+		Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) *
+		Math.sin(dLon / 2) * Math.sin(dLon / 2);
+	var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+	var d = R * c; // Distance in km
+	return d / 1000;
+}
+
+function deg2rad(deg) {
+	return deg * (Math.PI / 180)
+}
 
 module.exports = socket;
