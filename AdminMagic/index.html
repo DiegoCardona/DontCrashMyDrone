@@ -5,6 +5,7 @@
         <title>Don't crash my drone Admin</title>
 
         <link href="css/styles.css" rel="stylesheet"/>
+        <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css"/>
 
         <!-- AngularJS -->
         <script src="js/lib/angularjs.min.js?v=1.2.26"></script>
@@ -16,6 +17,8 @@
         <script src="js/lib/lodash.underscore.min.js?v=2.4.1"></script>
         <script src="js/lib/angular-google-maps.min.js?v=1.2.2"></script>
 
+        <script src="js/ui-bootstrap-tpls-1.3.2.min.js"></script>
+
         <!-- Custom angular module -->
         <script src="js/map.js?v=1.0"></script>
 
@@ -24,11 +27,16 @@
 		<script type="text/javascript" src="js/app.js"></script>
     </head>
     <body ng-controller="AdminController">
-        <div class="map_container" >
-            <google-map center="map.center" zoom="map.zoom" draggable="true" options="map.options" control="map.control">
-                <markers models="map.markers" coords="'self'" options="'options'" isLabel='true'>
-                </markers>
-            </google-map>
-        </div>  
+    <div><button type="button" class="create-zone btn btn-default" role="button"  ng-click="createZone()">Crear zona restringida</button><br></div>
+    	<div id="map" style=" height: 100%; width: 100%; margin: 0px;"  >
+		<google-map
+			style="position:absolute; height: 100%; width: 100%; margin: 0px;"
+			center="map.center" 
+			zoom="map.zoom"
+			draggable="true"
+			events="map.events"
+			options="map.options">
+		</google-map>
+		</div>
     </body>
 </html>
