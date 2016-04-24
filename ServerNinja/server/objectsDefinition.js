@@ -13,7 +13,7 @@
 {
 	latitude: 0.0, // type number
 	longitude: 0.0, // type number
-	radio: 1, // type number, the radio would be given in meters
+	radius: 1, // type number, the radio would be given in meters
 	description: 'No description Assgined' // type string, text that describe the type o reason because is a restricted area
 }
 
@@ -21,9 +21,9 @@
 {
 	latitude: 0.0, // type number
 	longitude: 0.0, // type number
-	radio: 1, // type number, the radio would be given in meters
+	radius: 1, // type number, the radio would be given in meters
 	description: 'No description Assgined', // type string
-	warinig_levet: 'low' // type string, low, medius, high, disaster
+	warning_levet: 'low' // type string, low, medius, high, disaster
 }
 
 

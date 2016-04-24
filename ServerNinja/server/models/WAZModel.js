@@ -10,7 +10,7 @@ var schema = new mongoose.Schema({
 		type: Number,
 		default: 0.0
 	},
-	radio: {
+	radius: {
 		type: Number,
 		default: 1
 	},
@@ -18,7 +18,7 @@ var schema = new mongoose.Schema({
 		type: String,
 		default: 'No description Assgined'
 	},
-	warinig_levet: {
+	warning_levet: {
 		type: String,
 		default: 'low'
 	}

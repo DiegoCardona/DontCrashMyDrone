@@ -2,7 +2,7 @@
 var mongoose = require('mongoose');
 
 var schema = new mongoose.Schema({
-	id: {
+	external_id: {
 		type: String,
 		default: '0'
 	},

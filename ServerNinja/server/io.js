@@ -19,146 +19,212 @@ var log = function(inst) {
 var NFZ = require('./models/NFZModel');
 var WAZ = require('./models/WAZModel');
 var Drone = require('./models/DroneModel');
+var User = require('./models/UserModel');
 
 // Socket logic
 socket.on('connection', function(sk) {
 
-	clients[sk.client.id] = {
-		socket: socket,
-		username: '',
-		userType: ''
-	};
+
 
 	sk.on('testConnection', function(data) {
-		sk.join(data.id);
-		sk.to(data.id).emit('confirmedConnection', 'ok');
+		console.log('testConnection event');
+		console.log(data);
+		clients[data.id] = sk.client.id;
+		sk.emit('/#' + clients[data.id]).emit('confirmedConnection', 'ok');
 	});
 
 	sk.on('droneReport', function(data) {
-		sk.join(data.id);
-		sk.to(data.id).emit('report', data);
-		sk.to('admin').emit('report', data);
+		console.log('droneReport event');
+		console.log(data);
+		clients[data.id] = sk.client.id;
+
+		Drone.findOne({
+			external_id: data.id
+		}, function(err, drones) {
+			if (drones != null && drones.length > 0) {
+				drones.accuracy = data.accuracy;
+				drones.latitude = data.latitude;
+				drones.longitude = data.longitude;
+				drones.height = data.height;
+				drones.orientation = data.orientation;
+				drones.velocity = data.velocity;
+				drones.save();
+			} else {
+				droneSave = new Drone({
+					external_id: data.id,
+					accuracy: data.accuracy,
+					latitude: data.latitude,
+					longitude: data.longitude,
+					height: data.height,
+					orientation: data.orientation,
+					velocity: data.velocity
+				});
+				droneSave.save(function(err) {
+					console.log(err)
+				});
+			}
+		});
+		sk.broadcast.to('/#' + clients[data.id]).emit('report', 'ok');
+		sk.broadcast.to('admin').emit('report', data);
 	});
 
 	sk.on('clientConnection', function(data) {
-		if (typeof data.droneId != 'undefined')
-			sk.join(data.droneId);
-		else if (typeof data.role != 'admin')
+		console.log('clientConnection event');
+		console.log(data);
+		clients[data.id] = sk.client.id;
+
+		if (data.role == 'customer')
+			sk.join('/#' + data.droneId);
+		else if (data.role == 'admin')
 			sk.join('admin');
-		mapData = {
-			Drone: {
-				id: '01',
-				accuracy: 0,
-				latitude: 0.0,
-				longitude: 0.0,
-				height: 0.0,
-				orientation: 'ND',
-				velocity: 0
-			},
-			WAZ: [{
-				latitude: 0.0,
-				longitude: 0.0,
-				radio: 1,
-				description: 'No description Assgined',
-				warinig_levet: 'low'
-			}],
-			NFZ: [{
-				latitude: 0.0,
-				longitude: 0.0,
-				radio: 1,
-				description: 'No description Assgined'
-			}]
-		};
-		sk.to(data.id).emit('connection', mapData);
+
+		User.findOne({
+			external_id: data.id
+		}, function(err, users) {
+			if (users != null && users.length > 0) {
+				users.Drone = data.droneId;
+				users.role = data.role;
+				users.email = data.email;
+				users.save();
+			} else {
+				userSave = new User({
+					external_id: data.id,
+					Drone: data.droneId,
+					role: data.role,
+					email: data.email
+				});
+				userSave.save(function(err) {
+					console.log(err)
+				});
+			}
+		});
+
+		Drone.findOne({
+			external_id: data.droneId
+		}, function(err, drones) {
+			WAZ.find({}, function(err, wazes) {
+				if (wazes == null)
+					wazes = [];
+				NFZ.find({}, function(err, nfzes) {
+					if (nfzes == null)
+						nfzes = [];
+					Drone.find({
+						external_id: {
+							$ne: data.droneId
+						}
+					}, function(err, dronesExt) {
+						if (dronesExt == null)
+							dronesExt = [];
+						mapData = {
+							Drone: drones,
+							Drones: dronesExt,
+							WAZ: wazes,
+							NFZ: nfzes
+						}
+						sk.emit('/#' + clients[data.id]).emit('connection', mapData);
+					});
+				});
+			});
+		});
 	});
 
 	sk.on('allMap', function(data) {
-		sk.join(data.id);
-		mapData = {
-			Drone: {
-				id: '01',
-				accuracy: 0,
-				latitude: 0.0,
-				longitude: 0.0,
-				height: 0.0,
-				orientation: 'ND',
-				velocity: 0
-			},
-			Drones: [{
-				id: '02',
-				accuracy: 0,
-				latitude: 0.0,
-				longitude: 0.0,
-				height: 0.0,
-				orientation: 'ND',
-				velocity: 0
-			}],
-			WAZ: [{
-				latitude: 0.0,
-				longitude: 0.0,
-				radio: 1,
-				description: 'No description Assgined',
-				warinig_levet: 'low'
-			}],
-			NFZ: [{
-				latitude: 0.0,
-				longitude: 0.0,
-				radio: 1,
-				description: 'No description Assgined'
-			}]
-		};
-		sk.to(data.id).emit('allMap', mapData);
+		console.log('allMap event');
+		console.log(data);
+		clients[data.id] = sk.client.id;
+
+		Drone.findOne({
+			external_id: data.droneId
+		}, function(err, drones) {
+			WAZ.find({}, function(err, wazes) {
+				if (wazes == null)
+					wazes = [];
+				NFZ.find({}, function(err, nfzes) {
+					if (nfzes == null)
+						nfzes = [];
+					Drone.find({
+						external_id: {
+							$ne: droneId
+						}
+					}, function(err, dronesExt) {
+						if (dronesExt == null)
+							dronesExt = [];
+						mapData = {
+							Drone: drones,
+							Drones: dronesExt,
+							WAZ: wazes,
+							NFZ: nfzes
+						}
+						sk.emit('/#' + clients[data.id]).emit('allMap', mapData);
+					});
+				});
+			});
+		});
 	});
 
 	sk.on('wazMap', function(data) {
-		sk.join(data.id);
-		wazMap = [{
-			latitude: 0.0,
-			longitude: 0.0,
-			radio: 1,
-			description: 'No description Assgined',
-			warinig_levet: 'low'
-		}];
-		sk.to(data.id).emit('wazMap', wazMap);
+		console.log('wazMap event');
+		console.log(data);
+		clients[data.id] = sk.client.id;
+
+		if (typeof data.waz != 'undefined') {
+			waz = new WAZ(data.waz);
+			waz.save();
+			sk.emit('/#' + clients[data.id]).emit('wazCreated', waz);
+		} else {
+			WAZ.find({}, function(err, wazes) {
+				if (wazes == null)
+					wazes = [];
+				sk.emit('/#' + clients[data.id]).emit('wazMap', wazes);
+			});
+		}
 	});
 
 	sk.on('nfzMap', function(data) {
-		sk.join(data.id);
-		nfzMap = [{
-			latitude: 0.0,
-			longitude: 0.0,
-			radio: 1,
-			description: 'No description Assgined'
-		}];
-		sk.to(data.id).emit('nfzMap', nfzMap);
+		console.log('nfzMap event');
+		console.log(data);
+		clients[data.id] = sk.client.id;
+
+		if (typeof data.nfz != 'undefined') {
+			nfz = new NFZ(data.nfz);
+			nfz.save();
+			sk.emit('/#' + clients[data.id]).emit('nfzCreated', nfz);
+		} else {
+			NFZ.find({}, function(err, nfzes) {
+				if (nfzes == null)
+					nfzes = [];
+				sk.emit('/#' + clients[data.id]).emit('nfzMap', nfzes);
+			});
+		}
 	});
 
 	sk.on('dronesMap', function(data) {
-		sk.join(data.id);
-		droneMap = [{
-			id: '01',
-			accuracy: 0,
-			latitude: 0.0,
-			longitude: 0.0,
-			height: 0.0,
-			orientation: 'ND',
-			velocity: 0
-		}];
-		sk.to(data.id).emit('dronesMap', droneMap);
+		console.log('dronesMap event');
+		console.log(data);
+		clients[data.id] = sk.client.id;
+
+		Drone.find({
+				external_id: {
+					$ne: droneId
+				}
+			},
+			function(err, drones) {
+				if (drones == null)
+					drones = [];
+				sk.emit('/#' + clients[data.id]).emit('dronesMap', drones);
+			});
 	});
 
 	sk.on('droneHealthy', function(data) {
-		sk.join(data.id);
-		droneMap = {
-			id: '01',
-			accuracy: 0,
-			latitude: 0.0,
-			longitude: 0.0,
-			height: 0.0,
-			orientation: 'ND',
-			velocity: 0
-		};
-		sk.to(data.id).emit('droneHealthy', droneMap);
+		console.log('droneHealthy event');
+		console.log(data);
+		clients[data.id] = sk.client.id;
+
+		Drone.findOne({
+			external_id: data.droneId
+		}, function(err, drones) {
+			sk.emit('/#' + clients[data.id]).emit('droneHealthy', drones);
+		});
 	});
 });
 
