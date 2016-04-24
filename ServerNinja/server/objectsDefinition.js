@@ -25,3 +25,12 @@
 	description: 'No description Assgined', // type string
 	warinig_levet: 'low' // type string, low, medius, high, disaster
 }
+
+
+/*event clientConnection send*/
+{
+	id: '0a', // type string, unique
+	droneId: '01', // type string 
+	role: 'admin/customer' // type string, two options, admin or customer
+	email: 'fake@lie.com' // type string, would be in a valid email format 
+}
