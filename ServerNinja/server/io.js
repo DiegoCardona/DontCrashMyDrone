@@ -64,7 +64,7 @@ socket.on('connection', function(sk) {
 				});
 			}
 		});
-		sk.emit('/#' + clients[data.id]).emit('report', 'ok');
+		sk.broadcast.to('/#' + clients[data.id]).emit('report', 'ok');
 		sk.broadcast.to('admin').emit('report', data);
 	});
 
@@ -73,10 +73,9 @@ socket.on('connection', function(sk) {
 		console.log(data);
 		clients[data.id] = sk.client.id;
 
-		/*if (typeof data.droneId != 'undefined')
-			sk.join(data.droneId);
-		else */
-		if (data.role == 'admin')
+		if (data.role == 'customer')
+			sk.join('/#' + data.droneId);
+		else if (data.role == 'admin')
 			sk.join('admin');
 
 		User.findOne({
@@ -168,11 +167,17 @@ socket.on('connection', function(sk) {
 		console.log(data);
 		clients[data.id] = sk.client.id;
 
-		WAZ.find({}, function(err, wazes) {
-			if (wazes == null)
-				wazes = [];
-			sk.emit('/#' + clients[data.id]).emit('wazMap', wazes);
-		});
+		if (typeof data.waz != 'undefined') {
+			waz = new WAZ(data.waz);
+			waz.save();
+			sk.emit('/#' + clients[data.id]).emit('wazCreated', waz);
+		} else {
+			WAZ.find({}, function(err, wazes) {
+				if (wazes == null)
+					wazes = [];
+				sk.emit('/#' + clients[data.id]).emit('wazMap', wazes);
+			});
+		}
 	});
 
 	sk.on('nfzMap', function(data) {
@@ -180,11 +185,17 @@ socket.on('connection', function(sk) {
 		console.log(data);
 		clients[data.id] = sk.client.id;
 
-		NFZ.find({}, function(err, nfzes) {
-			if (nfzes == null)
-				nfzes = [];
-			sk.emit('/#' + clients[data.id]).emit('nfzMap', nfzes);
-		});
+		if (typeof data.nfz != 'undefined') {
+			nfz = new NFZ(data.nfz);
+			nfz.save();
+			sk.emit('/#' + clients[data.id]).emit('nfzCreated', nfz);
+		} else {
+			NFZ.find({}, function(err, nfzes) {
+				if (nfzes == null)
+					nfzes = [];
+				sk.emit('/#' + clients[data.id]).emit('nfzMap', nfzes);
+			});
+		}
 	});
 
 	sk.on('dronesMap', function(data) {
