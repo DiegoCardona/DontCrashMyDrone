@@ -80,6 +80,7 @@ socket.on('connection', function(sk) {
 						distance: distance
 					}
 					sk.broadcast.to('/#' + clients[data.id]).emit('alert', alert);
+					sk.broadcast.to('admin').emit('alert', alert);
 				}
 			});
 		});
@@ -97,6 +98,7 @@ socket.on('connection', function(sk) {
 						distance: distance
 					}
 					sk.broadcast.to('/#' + clients[data.id]).emit('alert', alert);
+					sk.broadcast.to('admin').emit('alert', alert);
 				}
 			});
 		});
