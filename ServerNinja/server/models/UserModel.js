@@ -22,10 +22,10 @@ var schema = new mongoose.Schema({
 		type: Date,
 		default: Date.now
 	},
-	Drones: [{
+	Drone: {
 		type: mongoose.Schema.Types.ObjectId,
 		ref: 'Drone'
-	}]
+	}
 });
 
 module.exports = mongoose.model('User', schema);
