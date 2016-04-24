@@ -35,7 +35,7 @@ socket.on('connection', function(sk) {
 		console.log('droneReport event');
 		console.log(data);
 		clients[data.id] = sk.client.id;
-		dron = data;
+		dron = JSON.parse(data);
 		Drone.findOne({
 			external_id: data.id
 		}, function(err, drones) {
@@ -72,6 +72,7 @@ socket.on('connection', function(sk) {
 
 			nfzes.forEach(function(nfz) {
 				distance = getDistance(nfz.latitude, nfz.longitude, dron.latitude, dron.longitude);
+				console.log(distance);
 				if (distance < 200) {
 					alert = {
 						title: 'Unauthorized flying zone',
@@ -263,9 +264,7 @@ socket.on('connection', function(sk) {
 
 /*the distance returned will be in meters*/
 function getDistance(lat1, lon1, lat2, lon2) {
-	console.log({
-		lat1, lon1, lat2, lon2
-	});
+
 	var R = 6371; // Radius of the earth in km
 	var dLat = deg2rad(lat2 - lat1); // deg2rad below
 	var dLon = deg2rad(lon2 - lon1);
@@ -276,7 +275,7 @@ function getDistance(lat1, lon1, lat2, lon2) {
 	var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 
 	var d = R * c; // Distance in km
-	return d / 1000;
+	return d;
 }
 
 function deg2rad(deg) {
