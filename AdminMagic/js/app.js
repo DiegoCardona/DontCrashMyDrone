@@ -57,6 +57,7 @@
 		})
 
 		socket.on("alert", function(alertData) {
+			console.log("Alert: " + alertData);
 			openAlert(alertData.title, alertData.description);
 		});
 
@@ -272,6 +273,7 @@
 
 			google.maps.event.addListener(zoneCircle, 'click', function(event) {
 				$scope.infoWindow.setContent(zoneData.description);															
+				$scope.infoWindow.setPosition(event.latLng);
 				$scope.mapInstance.panTo(event.latLng);
 				$scope.infoWindow.open($scope.mapInstance, this);
 			});
