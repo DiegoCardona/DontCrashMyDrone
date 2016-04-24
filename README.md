@@ -88,3 +88,5 @@ Web platform to manage drones and evade dangerous zones and dangerous crashes be
 	email: 'fake@lie.com' // type string, would be in a valid email format 
 }
 ```
+
+continue
