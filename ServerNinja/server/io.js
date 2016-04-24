@@ -24,19 +24,20 @@ var User = require('./models/UserModel');
 // Socket logic
 socket.on('connection', function(sk) {
 
-	clients[sk.client.id] = {
-		socket: socket,
-		username: '',
-		userType: ''
-	};
+
 
 	sk.on('testConnection', function(data) {
-		sk.join(data.id);
-		sk.to(data.id).emit('confirmedConnection', 'ok');
+		console.log('testConnection event');
+		console.log(data);
+		clients[data.id] = sk.client.id;
+		sk.emit('/#' + clients[data.id]).emit('confirmedConnection', 'ok');
 	});
 
 	sk.on('droneReport', function(data) {
-		sk.join(data.id);
+		console.log('droneReport event');
+		console.log(data);
+		clients[data.id] = sk.client.id;
+
 		Drone.findOne({
 			id: data.id
 		}, function(err, drones) {
@@ -63,11 +64,15 @@ socket.on('connection', function(sk) {
 				});
 			}
 		});
-		sk.to(data.id).emit('report', data);
-		sk.to('admin').emit('report', data);
+		sk.emit('/#' + clients[data.id]).emit('report', data);
+		sk.broadcast.to('admin').emit('report', data);
 	});
 
 	sk.on('clientConnection', function(data) {
+		console.log('clientConnection event');
+		console.log(data);
+		clients[data.id] = sk.client.id;
+
 		if (typeof data.droneId != 'undefined')
 			sk.join(data.droneId);
 		else if (typeof data.role != 'admin')
@@ -97,11 +102,14 @@ socket.on('connection', function(sk) {
 				description: 'No description Assgined'
 			}]
 		};
-		sk.to(data.id).emit('connection', mapData);
+		sk.emit('/#' + clients[data.id]).emit('connection', mapData);
 	});
 
 	sk.on('allMap', function(data) {
-		sk.join(data.id);
+		console.log('allMap event');
+		console.log(data);
+		clients[data.id] = sk.client.id;
+
 		mapData = {
 			Drone: {
 				id: '01',
@@ -135,11 +143,14 @@ socket.on('connection', function(sk) {
 				description: 'No description Assgined'
 			}]
 		};
-		sk.to(data.id).emit('allMap', mapData);
+		sk.emit('/#' + clients[data.id]).emit('allMap', mapData);
 	});
 
 	sk.on('wazMap', function(data) {
-		sk.join(data.id);
+		console.log('wazMap event');
+		console.log(data);
+		clients[data.id] = sk.client.id;
+
 		wazMap = [{
 			latitude: 0.0,
 			longitude: 0.0,
@@ -147,22 +158,28 @@ socket.on('connection', function(sk) {
 			description: 'No description Assgined',
 			warinig_levet: 'low'
 		}];
-		sk.to(data.id).emit('wazMap', wazMap);
+		sk.emit('/#' + clients[data.id]).emit('wazMap', wazMap);
 	});
 
 	sk.on('nfzMap', function(data) {
-		sk.join(data.id);
+		console.log('nfzMap event');
+		console.log(data);
+		clients[data.id] = sk.client.id;
+
 		nfzMap = [{
 			latitude: 0.0,
 			longitude: 0.0,
 			radio: 1,
 			description: 'No description Assgined'
 		}];
-		sk.to(data.id).emit('nfzMap', nfzMap);
+		sk.emit('/#' + clients[data.id]).emit('nfzMap', nfzMap);
 	});
 
 	sk.on('dronesMap', function(data) {
-		sk.join(data.id);
+		console.log('dronesMap event');
+		console.log(data);
+		clients[data.id] = sk.client.id;
+
 		droneMap = [{
 			id: '01',
 			accuracy: 0,
@@ -172,11 +189,14 @@ socket.on('connection', function(sk) {
 			orientation: 'ND',
 			velocity: 0
 		}];
-		sk.to(data.id).emit('dronesMap', droneMap);
+		sk.emit('/#' + clients[data.id]).emit('dronesMap', droneMap);
 	});
 
 	sk.on('droneHealthy', function(data) {
-		sk.join(data.id);
+		console.log('droneHealthy event');
+		console.log(data);
+		clients[data.id] = sk.client.id;
+
 		droneMap = {
 			id: '01',
 			accuracy: 0,
@@ -186,7 +206,7 @@ socket.on('connection', function(sk) {
 			orientation: 'ND',
 			velocity: 0
 		};
-		sk.to(data.id).emit('droneHealthy', droneMap);
+		sk.emit('/#' + clients[data.id]).emit('droneHealthy', droneMap);
 	});
 });
 
