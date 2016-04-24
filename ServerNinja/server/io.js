@@ -78,7 +78,7 @@ socket.on('connection', function(sk) {
 		else if (typeof data.role != 'admin')
 			sk.join('admin');
 
-		USer.findOne({
+		User.findOne({
 			id: data.id
 		}, function(err, users) {
 			if (users != null && users.length > 0) {
