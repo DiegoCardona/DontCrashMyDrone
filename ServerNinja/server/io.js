@@ -73,9 +73,10 @@ socket.on('connection', function(sk) {
 		console.log(data);
 		clients[data.id] = sk.client.id;
 
-		if (typeof data.droneId != 'undefined')
+		/*if (typeof data.droneId != 'undefined')
 			sk.join(data.droneId);
-		else if (data.role == 'admin')
+		else */
+		if (data.role == 'admin')
 			sk.join('admin');
 
 		User.findOne({

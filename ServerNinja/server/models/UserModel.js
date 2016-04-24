@@ -23,8 +23,8 @@ var schema = new mongoose.Schema({
 		default: Date.now
 	},
 	Drone: {
-		type: mongoose.Schema.Types.ObjectId,
-		ref: 'Drone'
+		type: String,
+		default: ''
 	}
 });
 
