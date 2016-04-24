@@ -1,0 +1,17 @@
+<div>
+	<div class="modal-header">
+		<h3 class="modal-title"><i ng-class="activationIcon"></i> Crea una zona restringida</h3>
+	</div>
+	<div class="modal-body">
+		Latitud:
+		<input ng-model="latitude" class="form-control" placeholder="Latitud"/>
+		Longitud:
+		<input ng-model="longitude" class="form-control" placeholder="Longitud"/>
+		Radio (m):
+		<input ng-model="radius" class="form-control" placeholder="Radio"/>
+	</div>
+	<div class="modal-footer">
+		<button class="btn btn-primary" ng-click="negativeClick()">Cancelar</button>
+		<button class="btn btn-primary" ng-click="positiveClick()">Aceptar</button>
+	</div>
+</div>

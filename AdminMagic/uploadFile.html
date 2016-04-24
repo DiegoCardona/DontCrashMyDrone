@@ -1,0 +1,15 @@
+<div>
+	<div class="modal-header">
+		<h3 class="modal-title"><i ng-class="activationIcon"></i> Sube un archivo</h3>
+	</div>
+	<div class="modal-body">
+		Archivo:
+	    <input type="file" ngf-select ng-model="uploadFile" name="file"    
+	             accept="*" ngf-max-size="2MB" required
+	             ngf-model-invalid="errorFile"/>
+	</div>
+	<div class="modal-footer">
+		<button class="btn btn-primary" ng-click="negativeClick()">Cancelar</button>
+		<button class="btn btn-primary" ng-click="positiveClick()">Aceptar</button>
+	</div>
+</div>
