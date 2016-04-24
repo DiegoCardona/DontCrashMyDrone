@@ -1,11 +1,11 @@
 (function() {
-	var app = angular.module('dcmdAdmin', ['socket-io','google-maps','ui.bootstrap']);
+	var app = angular.module('dcmdAdmin', ['socket-io','google-maps','ngAnimate','ui.bootstrap','ngFileUpload']);
 
 	// app.config(["$socketProvider", function ($socketProvider) {
  //      $socketProvider.setUrl("http://localhost:3000");
  //    }]);
 
-	app.controller('AdminController', ['$scope','socket',function($scope, socket) {
+	app.controller('AdminController', ['$scope','socket','$uibModal',function($scope, socket,$uibModal) {
 
 		var firstExecution = true;
 
@@ -19,8 +19,8 @@
 		$scope.droneArray = [];
 		$scope.markers = [];
 		$scope.circles = [];
-		$scope.nfzArray = [{description:"Aeropuerto El Dorado", latitude:4.697395, longitude:-74.141688, radius:5}];
-		$scope.wazArray = [{description:"Lluvia leve", latitude:4.6326047, longitude:-74.1088265, radius:2}];
+		$scope.nfzArray = [];
+		$scope.wazArray = [];
 
 		$scope.infoWindow = new google.maps.InfoWindow({
 			content: "",
@@ -29,6 +29,8 @@
 
 		socket.on("connection", function(data) {
 			console.log(data);
+			$scope.nfzArray = data.NFZ;
+			$scope.wazArray = data.WAZ;
 			updateContent();
 		});
 
@@ -53,6 +55,10 @@
 
 			updateContent();
 		})
+
+		socket.on("alert", function(alertData) {
+			openAlert(alertData.title, alertData.description);
+		});
 
 		$scope.checkMap = function() {
 			if($scope.mapInstance) {
@@ -81,6 +87,7 @@
 						if(firstExecution) {
 							socket.emit("clientConnection", clientData);
 							firstExecution = false;
+							createClickHandler();
 						}
 					});
 				}
@@ -97,6 +104,35 @@
 				panControl: false
 			}, 
 			show: true	
+		};
+
+		var UploadModalController = function($scope, $uibModalInstance, Upload) {
+			$scope.positiveClick = function() {
+				if($scope.uploadFile) {
+					$scope.uploadFile = Upload.upload({
+						url:'http://localhost/DontCrashMyDrone/AdminMagic/abc.js',
+						data:{file:$scope.uploadFile}
+					});
+				}
+				else {
+					console.log("No has seleccionado nada");
+				}
+				// file.upload = Upload.upload({
+			 //      url: 'https://angular-file-upload-cors-srv.appspot.com/upload',
+			 //      data: {username: $scope.username, file: file},
+			 //    });
+			};
+			$scope.negativeClick = function() {
+				$uibModalInstance.close();
+			}
+		};
+
+		$scope.createIntegration = function() {
+			var messageModal = $uibModal.open({
+				templateUrl: './uploadFile.html',
+				controller: UploadModalController,
+				backdrop: 'static'
+			});
 		};
 
 		var updateContent = function() {
@@ -117,10 +153,80 @@
 				createMarker(drone);
 			});
 			$scope.nfzArray.forEach(function(nfz) {
-				createZone(nfz, true);
+				createCircle(nfz, true);
 			});
 			$scope.wazArray.forEach(function(waz) {
-				createZone(waz, false);
+				createCircle(waz, false);
+			});
+		};
+
+		var createClickHandler = function() {
+			$scope.mapInstance.addListener('click',function(data) {
+				console.log(data.latLng.lat() + "," + data.latLng.lng());
+				openMessage(data.latLng.lat(),data.latLng.lng());
+			})
+		};
+
+		var InputModalController = function($scope, $uibModalInstance, latitude, longitude) {
+			$scope.latitude = latitude;
+			$scope.longitude = longitude;
+			$scope.radius = 1000;
+
+			$scope.positiveClick = function() {
+				var nfz = {
+					id:"jalopezmo", 
+					nfz:{
+						latitude: $scope.latitude,
+						longitude: $scope.longitude,
+						radius: $scope.radius,
+						description: "Zona de vuelo restringido"
+					}
+				};
+
+				socket.emit('nfzMap',nfz);
+				$scope.$$prevSibling.scopeCreateCircle(nfz.nfz, true);
+				$uibModalInstance.close();
+			};
+			$scope.negativeClick = function() {
+				$uibModalInstance.close();
+			}
+		};
+
+		var openMessage = function(lat, lng) {
+			var messageModal = $uibModal.open({
+				templateUrl: './genericModal.html',
+				controller: InputModalController,
+				backdrop: 'static',
+				resolve: {
+					latitude: function() {
+						return lat;
+					},
+					longitude: function() {
+						return lng;
+					}
+				}
+			});
+		};
+
+		var AlertModalController = function($scope, $uibModalInstance, title, message) {
+			$scope.positiveClick = function() {
+				$uibModalInstance.close();
+			};
+		};
+
+		var openAlert = function(title, message) {
+			var alertModal = $uibModal.open({
+				templateUrl: './alertModal.html',
+				controller: AlertModalController,
+				backdrop: 'static',
+				resolve: {
+					title: function() {
+						return title;
+					},
+					message: function() {
+						return message;
+					}
+				}
 			});
 		};
 
@@ -147,7 +253,11 @@
 			$scope.markers.push(marker);
 		}
 
-		var createZone = function(zoneData, isNFZ) {
+		$scope.scopeCreateCircle = function(zoneData, isNFZ) {
+			createCircle(zoneData, isNFZ);
+		};
+
+		var createCircle = function(zoneData, isNFZ) {
 
 			var zoneCircle = new google.maps.Circle({
 								    strokeColor: isNFZ?'#FCFC6F':'#38DEFF',
@@ -156,8 +266,8 @@
 								    fillColor: isNFZ?'#FFFF82':'#6EE7FF',
 								    fillOpacity: 0.2,
 								    map: $scope.mapInstance,
-								    center: new google.maps.LatLng(zoneData.latitude, zoneData.longitude),
-								    radius: zoneData.radius * 1000
+								    center: new google.maps.LatLng(parseFloat(zoneData.latitude), parseFloat(zoneData.longitude)),
+								    radius: parseFloat(zoneData.radius)
 							    });
 
 			google.maps.event.addListener(zoneCircle, 'click', function(event) {
