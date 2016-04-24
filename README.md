@@ -15,13 +15,20 @@ Web platform to manage drones and evade dangerous zones and dangerous crashes be
 
 
 
+
 **event:** clientConnection
 
 **response:** connection
 
-**sent data:** ```javascript {id: '0a', // type string, uniquedroneId: '01', // type string role: 'admin/customer' // type string, two options, admin or customeremail: 'fake@lie.com' // type string, would be in a valid email format }```
+**sent data:** 
+```javascript 
+{id: '0a', // type string, unique
+droneId: '01', // type string 
+role: 'admin/customer' // type string, two options, admin or customer
+email: 'fake@lie.com' // type string, would be in a valid email format }```
 
 **received data:** ```javascript {Drone:{},Drones:[{}],WAZ:[{}],NFZ:[{}]}```
+
 
 
 **event:** droneReport
@@ -33,6 +40,7 @@ Web platform to manage drones and evade dangerous zones and dangerous crashes be
 **received data:** ok
 
 
+
 **event:** allMap
 
 **response:** allMap
@@ -40,6 +48,7 @@ Web platform to manage drones and evade dangerous zones and dangerous crashes be
 **sent data:** ```javascript {id: '0a', // type string, uniquedroneId: '01', // type string role: 'admin/customer' // type string, two options, admin or customeremail: 'fake@lie.com' // type string, would be in a valid email format }```
 
 **received data:** ```javascript {Drone:{},Drones:[{}],WAZ:[{}],NFZ:[{}]}```
+
 
 
 **event:** wazMap
@@ -50,6 +59,23 @@ Web platform to manage drones and evade dangerous zones and dangerous crashes be
 
 **received data:** WAZ Objects List
 
+**response:** wazCreated
+
+**sent data:** 
+```javascript 
+{
+	latitude: 0.0, // type number
+	longitude: 0.0, // type number
+	radius: 1, // type number, the radio would be given in meters
+	description: 'No description Assgined', // type string
+	warning_levet: 'low' // type string, low, medius, high, disaster
+}
+```
+
+**received data:** WAZ Object
+
+
+
 
 **event:** nfzMap
 
@@ -59,6 +85,21 @@ Web platform to manage drones and evade dangerous zones and dangerous crashes be
 
 **received data:** NFZ Objects List
 
+**response:** nfzCreated
+
+**sent data:** 
+```javascript 
+{
+	latitude: 0.0, // type number
+	longitude: 0.0, // type number
+	radius: 1, // type number, the radio would be given in meters
+	description: 'No description Assgined' // type string, text that describe the type o reason because is a restricted area
+}
+```
+
+**received data:** NFZ Object
+
+
 
 **event:** dronesMap
 
@@ -67,6 +108,7 @@ Web platform to manage drones and evade dangerous zones and dangerous crashes be
 **sent data:** ```javascript {id: 'xx',droneId: 'current_drone_id'}```
 
 **received data:** Drones Objects List
+
 
 
 **event:** droneHealthy
